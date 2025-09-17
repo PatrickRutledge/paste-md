@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <Product Id="*"
+           Name="paste-md"
+           Language="1033"
+           Version="1.0.0.0"
+           Manufacturer="paste-md"
+           UpgradeCode="A1B2C3D4-E5F6-7890-ABCD-EF1234567890">
+
+    <Package InstallerVersion="200"
+             Compressed="yes"
+             InstallScope="perMachine"
+             Platform="x64"
+             Description="Windows shell extension for pasting rendered Markdown"
+             Manufacturer="paste-md"
+             Comments="Paste Markdown as beautifully formatted text in any application" />
+
+    <MediaTemplate EmbedCab="yes" />
+
+    <Feature Id="ProductFeature" Title="paste-md" Level="1">
+      <ComponentGroupRef Id="ProductComponents" />
+      <ComponentRef Id="RegistryEntries" />
+    </Feature>
+
+    <Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
+    <UIRef Id="WixUI_InstallDir" />
+    <UIRef Id="WixUI_ErrorProgressText" />
+
+    <!-- License -->
+    <WixVariable Id="WixUILicenseRtf" Value="$(var.ProjectDir)\installer\License.rtf" />
+
+    <!-- Custom Actions -->
+    <CustomAction Id="RegisterDLL"
+                  Directory="INSTALLFOLDER"
+                  ExeCommand="regasm.exe &quot;[INSTALLFOLDER]paste-md.Core.dll&quot; /codebase"
+                  Execute="deferred"
+                  Impersonate="no"
+                  Return="check" />
+
+    <CustomAction Id="UnregisterDLL"
+                  Directory="INSTALLFOLDER"
+                  ExeCommand="regasm.exe &quot;[INSTALLFOLDER]paste-md.Core.dll&quot; /u"
+                  Execute="deferred"
+                  Impersonate="no"
+                  Return="ignore" />
+
+    <CustomAction Id="RestartExplorer"
+                  Directory="INSTALLFOLDER"
+                  ExeCommand="cmd.exe /c &quot;taskkill /f /im explorer.exe &amp; start explorer.exe&quot;"
+                  Execute="deferred"
+                  Impersonate="yes"
+                  Return="ignore" />
+
+    <InstallExecuteSequence>
+      <Custom Action="UnregisterDLL" Before="RemoveFiles">Installed</Custom>
+      <Custom Action="RegisterDLL" After="InstallFiles">NOT Installed</Custom>
+      <Custom Action="RestartExplorer" After="RegisterDLL">NOT Installed</Custom>
+    </InstallExecuteSequence>
+
+    <!-- Installation Directory -->
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="ProgramFiles64Folder">
+        <Directory Id="INSTALLFOLDER" Name="paste-md">
+        </Directory>
+      </Directory>
+
+      <!-- Start Menu -->
+      <Directory Id="ProgramMenuFolder">
+        <Directory Id="ApplicationProgramsFolder" Name="paste-md"/>
+      </Directory>
+    </Directory>
+
+    <!-- Components -->
+    <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+
+      <!-- Main DLL -->
+      <Component Id="MainDLL" Guid="B8C4B8A1-7E4D-4F8A-9C3B-000000000001" Win64="yes">
+        <File Id="PasteMdCoreDLL"
+              Source="$(var.ProjectDir)\bin\Release\net6.0-windows\paste-md.Core.dll"
+              KeyPath="yes" />
+      </Component>
+
+      <!-- Markdig dependency -->
+      <Component Id="MarkdigDLL" Guid="B8C4B8A1-7E4D-4F8A-9C3B-000000000002" Win64="yes">
+        <File Id="MarkdigDLL"
+              Source="$(var.ProjectDir)\bin\Release\net6.0-windows\Markdig.dll" />
+      </Component>
+
+      <!-- System.Drawing.Common dependency -->
+      <Component Id="SystemDrawingDLL" Guid="B8C4B8A1-7E4D-4F8A-9C3B-000000000003" Win64="yes">
+        <File Id="SystemDrawingCommonDLL"
+              Source="$(var.ProjectDir)\bin\Release\net6.0-windows\System.Drawing.Common.dll" />
+      </Component>
+
+      <!-- Microsoft.Win32.Registry dependency -->
+      <Component Id="RegistryDLL" Guid="B8C4B8A1-7E4D-4F8A-9C3B-000000000004" Win64="yes">
+        <File Id="Win32RegistryDLL"
+              Source="$(var.ProjectDir)\bin\Release\net6.0-windows\Microsoft.Win32.Registry.dll" />
+      </Component>
+
+      <!-- Config file if needed -->
+      <Component Id="ConfigFile" Guid="B8C4B8A1-7E4D-4F8A-9C3B-000000000005" Win64="yes">
+        <File Id="ConfigJSON"
+              Source="$(var.ProjectDir)\installer\config.json"
+              KeyPath="yes" />
+      </Component>
+
+    </ComponentGroup>
+
+    <!-- Registry entries -->
+    <Component Id="RegistryEntries" Guid="B8C4B8A1-7E4D-4F8A-9C3B-000000000006" Directory="TARGETDIR">
+
+      <!-- Register COM server -->
+      <RegistryKey Root="HKCR"
+                   Key="CLSID\{B8C4B8A1-7E4D-4F8A-9C3B-1234567890AB}">
+        <RegistryValue Type="string" Value="paste-md Context Menu Extension" />
+        <RegistryKey Key="InprocServer32">
+          <RegistryValue Type="string" Value="[INSTALLFOLDER]paste-md.Core.dll" />
+          <RegistryValue Name="ThreadingModel" Type="string" Value="Both" />
+        </RegistryKey>
+        <RegistryKey Key="ProgId">
+          <RegistryValue Type="string" Value="PasteMd.ContextMenuExtension" />
+        </RegistryKey>
+      </RegistryKey>
+
+      <!-- Register as approved shell extension -->
+      <RegistryKey Root="HKLM"
+                   Key="SOFTWARE\Microsoft\Windows\CurrentVersion\Shell Extensions\Approved">
+        <RegistryValue Name="{B8C4B8A1-7E4D-4F8A-9C3B-1234567890AB}"
+                       Type="string"
+                       Value="paste-md Context Menu Extension" />
+      </RegistryKey>
+
+      <!-- Register context menu for all files -->
+      <RegistryKey Root="HKCR"
+                   Key="*\shellex\ContextMenuHandlers\paste-md">
+        <RegistryValue Type="string" Value="{B8C4B8A1-7E4D-4F8A-9C3B-1234567890AB}" />
+      </RegistryKey>
+
+      <!-- Register context menu for folders -->
+      <RegistryKey Root="HKCR"
+                   Key="Folder\shellex\ContextMenuHandlers\paste-md">
+        <RegistryValue Type="string" Value="{B8C4B8A1-7E4D-4F8A-9C3B-1234567890AB}" />
+      </RegistryKey>
+
+      <!-- Register context menu for directory background -->
+      <RegistryKey Root="HKCR"
+                   Key="Directory\Background\shellex\ContextMenuHandlers\paste-md">
+        <RegistryValue Type="string" Value="{B8C4B8A1-7E4D-4F8A-9C3B-1234567890AB}" />
+      </RegistryKey>
+
+    </Component>
+
+  </Product>
+</Wix>

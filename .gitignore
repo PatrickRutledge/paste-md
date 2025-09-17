@@ -1,0 +1,139 @@
+# Build outputs
+bin/
+obj/
+build/
+*.dll
+*.exe
+*.pdb
+*.msi
+
+# Visual Studio
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.userprefs
+
+# VS Code
+.vscode/
+
+# JetBrains Rider
+.idea/
+*.sln.iml
+
+# NuGet
+packages/
+*.nupkg
+*.snupkg
+.nuget/
+
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+# MSTest test Results
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+
+# .NET Core
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# Files built by Visual Studio
+*_i.c
+*_p.c
+*_h.h
+*.ilk
+*.meta
+*.obj
+*.iobj
+*.pch
+*.ipch
+*.pgc
+*.pgd
+*.rsp
+*.sbr
+*.tlb
+*.tli
+*.tlh
+*.tmp
+*.tmp_proj
+*_wpftmp.csproj
+*.log
+*.vspscc
+*.vssscc
+.builds
+*.pidb
+*.svclog
+*.scc
+
+# WiX Toolset
+*.wixobj
+*.wixpdb
+*.msi
+*.msm
+*.msp
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Certificates (keep these secure!)
+*.pfx
+*.p12
+*.cer
+*.crt
+*.key
+
+# Local configuration
+local.settings.json
+appsettings.Development.json
+
+# Backup files
+*.bak
+*.backup
+*~
+
+# Temporary files
+*.tmp
+*.temp
+
+# Development/Test files
+src/paste-md.SimpleTest/
+Paste-md_Complete_PRD.md
+paste-rendered-markdown-user-prd.md
+DEVELOPER_GUIDE.md
+TESTING.md
+DEPLOYMENT.md
+FINAL-SUMMARY.md
+
+# Installer files (users should build their own)
+installer/config.json
+installer/License.rtf
+
+# Assets we don't have yet
+assets/
+
+# Claude settings
+.claude/
